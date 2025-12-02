@@ -7,26 +7,30 @@ STATE = (50, 0)
 amount = lambda x : (1 if x[0] == 'R' else -1) * int(x[1:])
 
 # Given a starting and ending number, determine how many times we passed zero.
-# 
-# Naive approach is to us // to count passes of zero, and then add 1 if we ended up at zero exactly.
-# However, 
-# Reduction function takes input of a state - (counter, zerocount) - and an instruction such as L5, and produces a state
-# For the zero counter, we take into account the number of times we passed 0 as well as whether we ended up on zero
-increment = lambda state, instruction : ((state[0] + amount(instruction)) % 100,
-                                         state[1] + abs((state[0] + amount(instruction)) // 100) + (1 if (state[0] + amount(instruction)) == 0 else 0))
+# The zero counter has three variations:
+#   - If we move right, it is simply the div of the current state plus the increment
+#   - If we move left *starting at zero*, it is simply the div of the absolute value of the increment
+#   - Otherwise if we move left, we need to absolutize the div from a negative rather than positive starting point
+perform_increment = lambda state, instruction : \
+  (tmp_increment := amount(instruction),
+   ((state[0] + tmp_increment) % 100,
+    state[1] + ((state[0] + tmp_increment) // 100 if tmp_increment > 0 \
+                 else (100 - state[0] - tmp_increment) // 100 if state[0] > 0 \
+                 else (-tmp_increment) // 100)))[-1]
 
 # Reduce the input given our starting state
-result = reduce(increment, sys.stdin.readlines(), STATE)
+result = reduce(perform_increment, sys.stdin.readlines(), STATE)
 
 print(result[1])
 
 # 6806 is too high
-print(increment((50, 0), "L50"))
-print(increment((50, 0), "R50"))
-print(increment((50, 0), "L5"))
-print(increment((50, 0), "R5"))
-print(increment((50, 0), "L500"))
-print(increment((50, 0), "R500"))
-print(increment((50, 0), "L550"))
-print(increment((50, 0), "R550"))
+# 6379 is too high
+print(perform_increment((50, 0), "L50"))
+print(perform_increment((50, 0), "R50"))
+print(perform_increment((50, 0), "L5"))
+print(perform_increment((50, 0), "R5"))
+print(perform_increment((50, 0), "L500"))
+print(perform_increment((50, 0), "R500"))
+print(perform_increment((50, 0), "L550"))
+print(perform_increment((50, 0), "R550"))
 
