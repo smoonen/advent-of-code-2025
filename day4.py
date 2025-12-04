@@ -2,11 +2,14 @@ import copy, sys
 
 matrix = list([list(x.rstrip()) for x in sys.stdin.readlines()])
 
-def neighborcount(x, y) :
-  count = 0
-  for tup in [(x,y) for x in range(-1,2) for y in range(-1,2) if x != 0 or y != 0] :
-    count += (matrix[x + tup[0]][y + tup[1]] == '@') if x+tup[0] >= 0 and x+tup[0] < len(matrix) and y+tup[1] >= 0 and y+tup[1] < len(matrix[0]) else 0
-  return count
+# Idea: we can simplify the exclusion ever so slightly if we allow the neighbor count to include the current cell.
+# We simply adjust our expectation to be <5 instead of <4.
+
+legal = lambda x, l : x >= 0 and x < len(l)
+neighborcount = lambda x, y : sum([int(matrix[i][j] == '@') for i in (x-1,x,x+1) for j in (y-1,y,y+1) if legal(i, matrix) and legal(j, matrix[0])])
+
+total = sum([int(neighborcount(x, y) < 5) for x in range(len(matrix)) for y in range(len(matrix[0])) if matrix[x][y] == '@'])
+print(f"Part 1: {total}")
 
 def movablecount(destroy = False) :
   global matrix
@@ -14,13 +17,11 @@ def movablecount(destroy = False) :
   count = 0
   for x in range(len(matrix)) :
     for y in range(len(matrix[x])) :
-      if matrix[x][y] == '@' and neighborcount(x, y) < 4 :
+      if matrix[x][y] == '@' and neighborcount(x, y) < 5 :
         count += 1
         if destroy : newmatrix[x][y] = '.'
   if destroy : matrix = newmatrix
   return count
-
-print(f"Part 1: {movablecount()}")
 
 total = 0
 while True :
