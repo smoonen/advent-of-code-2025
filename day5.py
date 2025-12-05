@@ -1,8 +1,8 @@
 import sys
 
 ranges, items = "".join(sys.stdin.readlines()).rstrip().split("\n\n")
-ranges = list(map(lambda x : range(x[0], x[1]+1), map(lambda x : list(map(int, x.split("-"))), ranges.split("\n"))))
-items = list(map(int, items.split("\n")))
+ranges = [(tmp := line.split("-"), range(int(tmp[0]), int(tmp[1])+1))[1] for line in ranges.split("\n")]
+items = [int(x) for x in items.split("\n")]
 
 fresh = sum([int(any([item in r for r in ranges])) for item in items])
 
