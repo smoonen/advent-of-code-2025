@@ -4,7 +4,7 @@ ranges, items = "".join(sys.stdin.readlines()).rstrip().split("\n\n")
 ranges = [(tmp := line.split("-"), range(int(tmp[0]), int(tmp[1])+1))[1] for line in ranges.split("\n")]
 items = [int(x) for x in items.split("\n")]
 
-fresh = sum([int(any([item in r for r in ranges])) for item in items])
+fresh = [any([item in r for r in ranges]) for item in items].count(True)
 
 print(f"Part 1: {fresh}")
 
