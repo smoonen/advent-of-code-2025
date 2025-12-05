@@ -14,12 +14,9 @@ ranges.sort(key = lambda x : x.start)
 # Combine ranges where possible. Short circuit if we have moved past the cursor's ending value
 cursor = 0
 while cursor < len(ranges) :
-  while cursor + 1 < len(ranges) :
-    if ranges[cursor].stop >= ranges[cursor + 1].start :
-      ranges[cursor] = range(ranges[cursor].start, max(ranges[cursor].stop, ranges[cursor + 1].stop))
-      del ranges[cursor + 1]
-    else :
-      break
+  while cursor + 1 < len(ranges) and ranges[cursor].stop >= ranges[cursor + 1].start :
+    ranges[cursor] = range(ranges[cursor].start, max(ranges[cursor].stop, ranges[cursor + 1].stop))
+    del ranges[cursor + 1]
   cursor += 1
 
 count = sum([len(r) for r in ranges])
